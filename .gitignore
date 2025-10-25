@@ -9,3 +9,12 @@ __pycache__/
 *.h5
 *.hdf5
 venv/
+
+# Coverage reports
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+coverage.xml
+*.cover
+.hypothesis/
