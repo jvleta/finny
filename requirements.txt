@@ -1,0 +1,19 @@
+# Requirements for Black-Scholes PDE Solver
+# Core numerical computing
+numpy>=1.21.0
+scipy>=1.7.0
+
+# Plotting and visualization
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# Jupyter notebook support (optional)
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# For enhanced numerical precision (optional)
+numba>=0.56.0
+
+# Additional scientific computing tools (optional)
+pandas>=1.3.0
+sympy>=1.9.0
