@@ -1,6 +1,6 @@
-# Black-Scholes PDE Solver using Crank-Nicolson Method
+# Finny
 
-A comprehensive Python implementation of the Black-Scholes partial differential equation solver using the Crank-Nicolson finite difference method. This numerical approach provides highly accurate option pricing and Greeks calculation with excellent stability properties.
+A Python toolkit for obtaining and visualizing solutions to the Black-Scholes PDE
 
 ## Features
 
