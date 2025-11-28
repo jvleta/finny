@@ -9,6 +9,7 @@ __pycache__/
 *.h5
 *.hdf5
 venv/
+dist/
 
 # Coverage reports
 .coverage
