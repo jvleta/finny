@@ -6,7 +6,7 @@ This project implements a comprehensive suite of Black-Scholes PDE solvers using
 
 ## Implemented Solvers
 
-### 1. European Black-Scholes Solver (`black_scholes_solver.py`)
+### 1. European Black-Scholes Solver (`src/finny/black_scholes_solver.py`)
 - **Purpose**: Core Black-Scholes PDE solver for European options
 - **Method**: Crank-Nicolson finite difference with second-order accuracy
 - **Features**:
@@ -17,7 +17,7 @@ This project implements a comprehensive suite of Black-Scholes PDE solvers using
   - Convergence analysis
 - **Test Coverage**: 97% (27 comprehensive unit tests)
 
-### 2. American Black-Scholes Solver (`american_black_scholes_solver.py`)
+### 2. American Black-Scholes Solver (`src/finny/american_black_scholes_solver.py`)
 - **Purpose**: Advanced solver for American options with early exercise capability
 - **Method**: Linear Complementarity Problem (LCP) solving with constraint enforcement
 - **Features**:
@@ -28,7 +28,7 @@ This project implements a comprehensive suite of Black-Scholes PDE solvers using
   - Progress tracking for long computations
 - **Test Coverage**: 98% (28 comprehensive unit tests)
 
-### 3. Dividend-Enhanced Black-Scholes Solver (`dividend_black_scholes_solver.py`)
+### 3. Dividend-Enhanced Black-Scholes Solver (`src/finny/dividend_black_scholes_solver.py`)
 - **Purpose**: Real-world applicable solver supporting dividend-paying stocks
 - **Method**: Extended Crank-Nicolson with dividend adjustments
 - **Features**:
@@ -112,7 +112,7 @@ This project implements a comprehensive suite of Black-Scholes PDE solvers using
 
 ### European Option
 ```python
-from black_scholes_solver import BlackScholesConfig, crank_nicolson_solver
+from finny import BlackScholesConfig, crank_nicolson_solver
 
 config = BlackScholesConfig(K=100, T=1, r=0.05, sigma=0.2, option_type='call')
 S_grid, t_grid, V_grid = crank_nicolson_solver(config, N_S=100, N_t=200)
@@ -120,7 +120,7 @@ S_grid, t_grid, V_grid = crank_nicolson_solver(config, N_S=100, N_t=200)
 
 ### American Option
 ```python
-from american_black_scholes_solver import AmericanBlackScholesConfig, american_crank_nicolson_solver
+from finny import AmericanBlackScholesConfig, american_crank_nicolson_solver
 
 config = AmericanBlackScholesConfig(K=100, T=1, r=0.05, sigma=0.2, option_type='put')
 result = american_crank_nicolson_solver(config, N_S=80, N_t=100, method='penalty')
@@ -128,7 +128,7 @@ result = american_crank_nicolson_solver(config, N_S=80, N_t=100, method='penalty
 
 ### Dividend-Enhanced Option
 ```python
-from dividend_black_scholes_solver import DividendBlackScholesConfig, DividendEvent, dividend_crank_nicolson_solver
+from finny import DividendBlackScholesConfig, DividendEvent, dividend_crank_nicolson_solver
 
 dividends = [DividendEvent(time=0.25, amount=1.0), DividendEvent(time=0.75, amount=1.0)]
 config = DividendBlackScholesConfig(K=100, T=1, dividend_yield=0.02, discrete_dividends=dividends)

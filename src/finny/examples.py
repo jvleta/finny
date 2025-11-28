@@ -2,16 +2,16 @@
 """
 Example script demonstrating the Black-Scholes PDE solver using Crank-Nicolson method
 
-This script shows how to use the black_scholes_solver module to price options
+This script shows how to use the finny package to price options
 and analyze their behavior.
 """
 
-from black_scholes_solver import (
-    BlackScholesConfig, 
-    crank_nicolson_solver, 
-    plot_results,
+from .black_scholes_solver import (
+    BlackScholesConfig,
     analytical_black_scholes,
-    demonstrate_solver
+    crank_nicolson_solver,
+    demonstrate_solver,
+    plot_results,
 )
 import numpy as np
 import matplotlib.pyplot as plt

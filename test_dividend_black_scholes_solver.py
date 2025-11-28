@@ -5,12 +5,20 @@ This module contains comprehensive unit tests for all functions and classes
 in the dividend_black_scholes_solver.py module.
 """
 
+import sys
 import unittest
+from pathlib import Path
+
 import numpy as np
 import numpy.testing as npt
 import warnings
 
-from dividend_black_scholes_solver import (
+ROOT_DIR = Path(__file__).resolve().parent
+SRC_PATH = ROOT_DIR / "src"
+if str(SRC_PATH) not in sys.path:
+    sys.path.insert(0, str(SRC_PATH))
+
+from finny.dividend_black_scholes_solver import (
     DividendEvent,
     DividendBlackScholesConfig,
     payoff_function_dividend,
@@ -271,7 +279,7 @@ class TestAnalyticalDividendBlackScholes(unittest.TestCase):
         )
         
         # Should be less than non-dividend case
-        from black_scholes_solver import analytical_black_scholes
+        from finny.black_scholes_solver import analytical_black_scholes
         no_div_result = analytical_black_scholes(S, K, T, r, sigma, 'call')
         
         self.assertLess(result, no_div_result)
@@ -286,7 +294,7 @@ class TestAnalyticalDividendBlackScholes(unittest.TestCase):
         )
         
         # Should be greater than non-dividend case
-        from black_scholes_solver import analytical_black_scholes
+        from finny.black_scholes_solver import analytical_black_scholes
         no_div_result = analytical_black_scholes(S, K, T, r, sigma, 'put')
         
         self.assertGreater(result, no_div_result)
@@ -302,7 +310,7 @@ class TestAnalyticalDividendBlackScholes(unittest.TestCase):
         )
         
         # Should be less than no-dividend case due to PV of dividends
-        from black_scholes_solver import analytical_black_scholes
+        from finny.black_scholes_solver import analytical_black_scholes
         no_div_result = analytical_black_scholes(S, K, T, r, sigma, 'call')
         
         self.assertLess(result, no_div_result)

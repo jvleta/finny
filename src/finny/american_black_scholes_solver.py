@@ -408,7 +408,7 @@ def compare_american_european(config: AmericanBlackScholesConfig, N_S: int = 100
     )
     
     # Import European solver
-    from black_scholes_solver import BlackScholesConfig, crank_nicolson_solver
+    from .black_scholes_solver import BlackScholesConfig, crank_nicolson_solver
     
     # Solve European option with same parameters
     european_config = BlackScholesConfig(

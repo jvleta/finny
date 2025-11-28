@@ -16,7 +16,7 @@ from typing import Dict, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from black_scholes_solver import BlackScholesConfig, crank_nicolson_solver
+from .black_scholes_solver import BlackScholesConfig, crank_nicolson_solver
 
 try:
     import yfinance as yf

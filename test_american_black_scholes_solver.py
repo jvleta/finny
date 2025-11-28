@@ -5,12 +5,20 @@ This module contains comprehensive unit tests for all functions and classes
 in the american_black_scholes_solver.py module.
 """
 
+import sys
 import unittest
+from pathlib import Path
+
 import numpy as np
 import numpy.testing as npt
 import warnings
 
-from american_black_scholes_solver import (
+ROOT_DIR = Path(__file__).resolve().parent
+SRC_PATH = ROOT_DIR / "src"
+if str(SRC_PATH) not in sys.path:
+    sys.path.insert(0, str(SRC_PATH))
+
+from finny.american_black_scholes_solver import (
     AmericanBlackScholesConfig,
     payoff_function,
     boundary_conditions_american,
