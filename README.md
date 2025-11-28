@@ -13,23 +13,6 @@ A Python toolkit for obtaining and visualizing solutions to the Black-Scholes PD
 - **Analytical Comparison**: Includes analytical Black-Scholes formula for validation
 - **Interactive Jupyter Notebook**: Step-by-step implementation and examples
 
-## Mathematical Background
-
-The Black-Scholes PDE is given by:
-
-```
-∂V/∂t + (1/2)σ²S²∂²V/∂S² + rS∂V/∂S - rV = 0
-```
-
-Where:
-- `V(S,t)` is the option value
-- `S` is the underlying asset price
-- `t` is time
-- `σ` is volatility
-- `r` is the risk-free interest rate
-
-The Crank-Nicolson method discretizes this PDE using an implicit finite difference scheme that averages the forward and backward Euler methods, providing superior stability and accuracy.
-
 ## Installation
 
 1. Clone the repository:
@@ -43,12 +26,17 @@ cd finny
 pip install -r requirements.txt
 ```
 
+3. Install the package locally (editable mode):
+```bash
+pip install -e .
+```
+
 ## Quick Start
 
 ### Basic Usage
 
 ```python
-from black_scholes_solver import BlackScholesConfig, crank_nicolson_solver
+from finny import BlackScholesConfig, crank_nicolson_solver
 
 # Configure option parameters
 config = BlackScholesConfig(
@@ -71,8 +59,8 @@ print(f"Option price at S=100, t=0: ${V_grid[50, 0]:.4f}")
 
 Execute the comprehensive examples:
 
-```python
-python examples.py
+```bash
+python -m finny.examples
 ```
 
 This will run five different examples demonstrating:
@@ -81,14 +69,6 @@ This will run five different examples demonstrating:
 3. Effect of time to expiration
 4. Greeks analysis
 5. Parameter sensitivity analysis
-
-### Jupyter Notebook
-
-Open the interactive notebook for step-by-step implementation:
-
-```bash
-jupyter notebook black_scholes_notebook.ipynb
-```
 
 ## API Reference
 
@@ -158,7 +138,7 @@ Generates:
 ### Example 1: Basic Call Option
 
 ```python
-from black_scholes_solver import *
+from finny import *
 
 config = BlackScholesConfig(K=100, T=0.5, r=0.03, sigma=0.15, option_type='call')
 S_grid, t_grid, V_grid = crank_nicolson_solver(config)
@@ -215,29 +195,7 @@ plt.title('Volatility Sensitivity')
 ```
 
 ## Numerical Properties
-
-### Stability
-The Crank-Nicolson method is unconditionally stable, meaning the numerical solution remains stable for any choice of time step `dt`. This is a significant advantage over explicit methods.
-
-### Accuracy
-- **Time discretization**: Second-order accurate (O(dt²))
-- **Space discretization**: Second-order accurate (O(dS²))
-- **Overall accuracy**: O(dt² + dS²)
-
-### Grid Convergence
-The solution converges to the analytical Black-Scholes price as the grid is refined. Typical relative errors are less than 0.1% with moderate grid sizes (N_S=100, N_t=1000).
-
-## Boundary Conditions
-
-The solver implements appropriate boundary conditions:
-
-**For Call Options:**
-- `V(0,t) = 0` (worthless when S=0)
-- `V(S_max,t) ≈ S_max - K×exp(-r×(T-t))` (deep in-the-money)
-
-**For Put Options:**
-- `V(0,t) = K×exp(-r×(T-t))` (maximum value when S=0)
-- `V(S_max,t) = 0` (worthless when S >> K)
+See `TECHNICAL_NOTES.md` for mathematical background, boundary conditions, and numerical properties.
 
 ## Performance Tips
 
@@ -246,42 +204,9 @@ The solver implements appropriate boundary conditions:
 3. **Memory Usage**: Memory requirement is O(N_S × N_t)
 4. **Sparse Matrices**: The implementation uses scipy.sparse for efficient matrix operations
 
-## Validation
-
-The solver has been validated against:
-- Analytical Black-Scholes formula (relative error < 0.1%)
-- Put-call parity
-- Greeks calculated analytically
-- Grid convergence studies
-
-## File Structure
-
-```
-finny/
-├── black_scholes_solver.py      # Main solver implementation
-├── black_scholes_notebook.ipynb # Interactive Jupyter notebook
-├── examples.py                  # Comprehensive examples
-├── requirements.txt             # Package dependencies
-└── README.md                   # This file
-```
-
-## Dependencies
-
-- **numpy**: Numerical computations and array operations
-- **scipy**: Sparse matrix operations and linear algebra
-- **matplotlib**: Plotting and visualization
-- **seaborn**: Enhanced plotting styles
-- **jupyter**: Interactive notebook support
-
-## References
-
-1. Black, F., & Scholes, M. (1973). The pricing of options and corporate liabilities. Journal of Political Economy, 81(3), 637-654.
-2. Wilmott, P., Howison, S., & Dewynne, J. (1995). The Mathematics of Financial Derivatives. Cambridge University Press.
-3. Crank, J., & Nicolson, P. (1947). A practical method for numerical evaluation of solutions of partial differential equations of the heat-conduction type. Mathematical Proceedings of the Cambridge Philosophical Society, 43(1), 50-67.
-
 ## License
 
-This project is open source and available under the MIT License.
+Packaging metadata currently marks the project as UNLICENSED. Add a license file and update pyproject.toml if you intend to publish under an open-source license.
 
 ## Contributing
 

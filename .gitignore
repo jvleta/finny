@@ -10,7 +10,7 @@ __pycache__/
 *.hdf5
 venv/
 dist/
-
+*.egg-info/
 # Coverage reports
 .coverage
 .coverage.*

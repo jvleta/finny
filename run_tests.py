@@ -13,6 +13,11 @@ import subprocess
 import argparse
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parent
+SRC_PATH = ROOT_DIR / "src"
+if str(SRC_PATH) not in sys.path:
+    sys.path.insert(0, str(SRC_PATH))
+
 # Import all test modules
 from test_black_scholes_solver import *
 from test_american_black_scholes_solver import *
@@ -56,7 +61,7 @@ def run_tests(args):
     cmd = [python_exe, "-m"]
     
     if args.coverage or args.html:
-        cmd.extend(["coverage", "run", "--source=.", "-m"])
+        cmd.extend(["coverage", "run", "--source=src/finny", "-m"])
     
     cmd.extend(["unittest"] + test_modules)
     
@@ -113,9 +118,9 @@ def analyze_coverage():
     print("="*60)
     
     coverage_targets = {
-        "black_scholes_solver.py": 95,
-        "american_black_scholes_solver.py": 95,
-        "dividend_black_scholes_solver.py": 95,
+        "src/finny/black_scholes_solver.py": 95,
+        "src/finny/american_black_scholes_solver.py": 95,
+        "src/finny/dividend_black_scholes_solver.py": 95,
     }
     
     print("Coverage targets:")
@@ -171,9 +176,9 @@ def main():
     args = parser.parse_args()
     
     # Check if we're in the right directory
-    if not Path("black_scholes_solver.py").exists():
+    if not Path("src/finny/black_scholes_solver.py").exists():
         print("Error: Run this script from the project root directory")
-        print("Current directory should contain black_scholes_solver.py")
+        print("Current directory should contain src/finny/black_scholes_solver.py")
         return 1
     
     # Check if virtual environment exists
