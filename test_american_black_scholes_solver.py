@@ -11,6 +11,7 @@ from pathlib import Path
 
 import numpy as np
 import numpy.testing as npt
+from scipy.sparse import diags
 import warnings
 
 ROOT_DIR = Path(__file__).resolve().parent
@@ -18,6 +19,14 @@ SRC_PATH = ROOT_DIR / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
+DIST_DIR = ROOT_DIR / "dist"
+if DIST_DIR.exists():
+    wheels = sorted(DIST_DIR.glob("finny-*.whl"))
+    if wheels:
+        wheel_path = str(wheels[-1])
+        if wheel_path not in sys.path:
+            sys.path.insert(0, wheel_path)
+            
 from finny.american_black_scholes_solver import (
     AmericanBlackScholesConfig,
     payoff_function,
@@ -29,7 +38,6 @@ from finny.american_black_scholes_solver import (
     compare_american_european,
     demonstrate_american_solver
 )
-from scipy.sparse import diags
 
 
 class TestAmericanBlackScholesConfig(unittest.TestCase):
@@ -152,9 +160,10 @@ class TestPenaltyMethodStep(unittest.TestCase):
         # Create a simple tridiagonal matrix
         diag_vals = np.ones(n) * 2
         off_diag = np.ones(n-1) * (-1)
+        offsets = (-1, 0, 1)
         
-        self.A = diags([off_diag, diag_vals, off_diag], offsets=[-1, 0, 1], format='csr')
-        self.B = diags([off_diag*0.5, diag_vals*0.5, off_diag*0.5], offsets=[-1, 0, 1], format='csr')
+        self.A = diags([off_diag, diag_vals, off_diag], offsets=offsets, format='csr')  # type: ignore[arg-type]
+        self.B = diags([off_diag*0.5, diag_vals*0.5, off_diag*0.5], offsets=offsets, format='csr')  # type: ignore[arg-type]
         
         self.V_old = np.random.rand(n)
         self.rhs = np.random.rand(n)
@@ -207,8 +216,9 @@ class TestProjectedSORStep(unittest.TestCase):
         diag_vals = np.ones(n) * 3
         off_diag = np.ones(n-1) * (-1)
         
-        self.A = diags([off_diag, diag_vals, off_diag], offsets=[-1, 0, 1], format='csr')
-        self.B = diags([off_diag*0.5, diag_vals*0.5, off_diag*0.5], offsets=[-1, 0, 1], format='csr')
+        offsets = (-1, 0, 1)
+        self.A = diags([off_diag, diag_vals, off_diag], offsets=offsets, format='csr')  # type: ignore[arg-type]
+        self.B = diags([off_diag*0.5, diag_vals*0.5, off_diag*0.5], offsets=offsets, format='csr')  # type: ignore[arg-type]
         
         self.V_old = np.random.rand(n)
         self.rhs = np.random.rand(n)
