@@ -1,6 +1,6 @@
 # Finny
 
-A Python toolkit for obtaining and visualizing solutions to the Black-Scholes PDE
+A financial modeling toolkit for obtaining and visualizing solutions to the Black-Scholes PDE
 
 ## Features
 
