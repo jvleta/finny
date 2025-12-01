@@ -15,6 +15,8 @@ from .dividend_black_scholes_solver import (
     dividend_crank_nicolson_solver,
 )
 
+from . import payoffs
+
 __all__ = [
     "BlackScholesConfig",
     "analytical_black_scholes",
@@ -24,6 +26,7 @@ __all__ = [
     "DividendBlackScholesConfig",
     "DividendEvent",
     "dividend_crank_nicolson_solver",
+    "payoffs",
 ]
 
 __version__ = "0.1.0"
