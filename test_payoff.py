@@ -20,44 +20,48 @@ matplotlib.use("Agg")
 def test_payoff_functions():
     asset_prices = np.array([80, 90, 100, 110, 120], dtype=float)
 
+    call_payoff = make_payoff(long_call_payoff, strike=100)
+    put_payoff = make_payoff(long_put_payoff, strike=100)
+    short_call = make_payoff(short_call_payoff, strike=100)
+    short_put = make_payoff(short_put_payoff, strike=100)
+    bull_spread = make_payoff(bull_spread_payoff, lower_strike=90, upper_strike=110)
+    butterfly_spread = make_payoff(
+        butterfly_spread_payoff, low_strike=90, mid_strike=100, high_strike=110
+    )
+
     np.testing.assert_array_equal(
-        long_call_payoff(asset_prices, strike=100),
+        call_payoff(asset_prices),
         np.array([0, 0, 0, 10, 20], dtype=float),
     )
     np.testing.assert_array_equal(
-        long_put_payoff(asset_prices, strike=100),
+        put_payoff(asset_prices),
         np.array([20, 10, 0, 0, 0], dtype=float),
     )
     np.testing.assert_array_equal(
-        short_call_payoff(asset_prices, strike=100),
-        -long_call_payoff(asset_prices, 100),
+        short_call(asset_prices),
+        -call_payoff(asset_prices),
     )
     np.testing.assert_array_equal(
-        short_put_payoff(asset_prices, strike=100),
-        -long_put_payoff(asset_prices, 100),
+        short_put(asset_prices),
+        -put_payoff(asset_prices),
     )
 
     np.testing.assert_array_equal(
-        bull_spread_payoff(asset_prices, lower_strike=90, upper_strike=110),
+        bull_spread(asset_prices),
         np.array([0, 0, 10, 20, 20], dtype=float),
     )
     np.testing.assert_array_equal(
-        butterfly_spread_payoff(
-            asset_prices, low_strike=90, mid_strike=100, high_strike=110
-        ),
+        butterfly_spread(asset_prices),
         np.array([0, 0, 10, 0, 0], dtype=float),
     )
     np.testing.assert_array_equal(
-        butterfly_spread_payoff(
-            np.array([105], dtype=float), low_strike=90, mid_strike=100, high_strike=110
-        ),
+        butterfly_spread(np.array([105], dtype=float)),
         np.array([5], dtype=float),
     )
 
-    call_payoff = make_payoff(long_call_payoff, strike=100)
     np.testing.assert_array_equal(
         call_payoff(asset_prices),
-        long_call_payoff(asset_prices, 100),
+        np.array([0, 0, 0, 10, 20], dtype=float),
     )
 
 

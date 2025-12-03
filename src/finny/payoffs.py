@@ -1,59 +1,65 @@
+import functools
 import numpy as np
-import numpy.typing as npt
 import matplotlib.pyplot as plt
-from typing import Callable, Mapping, Optional, Sequence, Tuple, Union, cast
-
-FloatArray = npt.NDArray[np.float64]
-PayoffCallable = Callable[[npt.ArrayLike], FloatArray]
-PayoffSeries = Union[
-    Mapping[str, PayoffCallable], Sequence[Tuple[str, PayoffCallable]]
-]
 
 
-def _as_float_array(asset_price: npt.ArrayLike) -> FloatArray:
-    return np.asarray(asset_price, dtype=float)
+def vectorize_payoff(payoff_fn, name=None):
+    """
+    Vectorize a scalar payoff function using NumPy while preserving metadata.
+    """
+    if getattr(payoff_fn, "_is_vectorized_payoff", False):
+        return payoff_fn
+
+    vectorized = np.vectorize(payoff_fn, otypes=[float])
+
+    def wrapper(*args, **kwargs):
+        return vectorized(*args, **kwargs)
+
+    wrapper._is_vectorized_payoff = True  # type: ignore[attr-defined]
+    wrapper.__name__ = name or getattr(
+        payoff_fn, "__name__", payoff_fn.__class__.__name__
+    )
+    wrapper.__doc__ = getattr(payoff_fn, "__doc__", None)
+    return wrapper
 
 
-def long_call_payoff(asset_price: npt.ArrayLike, strike: float) -> FloatArray:
+def long_call_payoff(asset_price, strike):
     """Long call payoff: max(S - E, 0)."""
-    asset_array = _as_float_array(asset_price)
-    return np.maximum(asset_array - strike, 0.0)
+    diff = asset_price - strike
+    return diff if diff > 0 else 0.0
 
 
-def long_put_payoff(asset_price: npt.ArrayLike, strike: float) -> FloatArray:
+def long_put_payoff(asset_price, strike):
     """Long put payoff: max(E - S, 0)."""
-    asset_array = _as_float_array(asset_price)
-    return np.maximum(strike - asset_array, 0.0)
+    diff = strike - asset_price
+    return diff if diff > 0 else 0.0
 
 
-def short_call_payoff(asset_price: npt.ArrayLike, strike: float) -> FloatArray:
+def short_call_payoff(asset_price, strike):
     """Short call payoff: -max(S - E, 0)."""
     return -long_call_payoff(asset_price, strike)
 
 
-def short_put_payoff(asset_price: npt.ArrayLike, strike: float) -> FloatArray:
+def short_put_payoff(asset_price, strike):
     """Short put payoff: -max(E - S, 0)."""
     return -long_put_payoff(asset_price, strike)
 
 
-def bull_spread_payoff(
-    asset_price: npt.ArrayLike, lower_strike: float, upper_strike: float
-) -> FloatArray:
+def bull_spread_payoff(asset_price, lower_strike, upper_strike):
     """Bull spread from long lower-strike call and short higher-strike call."""
     return long_call_payoff(asset_price, lower_strike) - long_call_payoff(
         asset_price, upper_strike
     )
 
 
-def butterfly_spread_payoff(
-    asset_price: npt.ArrayLike, low_strike: float, mid_strike: float, high_strike: float
-) -> FloatArray:
+def butterfly_spread_payoff(asset_price, low_strike, mid_strike, high_strike):
     """Butterfly spread from long low/high calls and short twice mid call."""
     return (
         long_call_payoff(asset_price, low_strike)
         - 2 * long_call_payoff(asset_price, mid_strike)
         + long_call_payoff(asset_price, high_strike)
     )
+
 
 # TODO: Implement straddle payoff diagram and add unit test.
 # TODO: Implement strangle payoff diagram and add unit test.
@@ -66,24 +72,35 @@ def butterfly_spread_payoff(
 # TODO: Implement ratio spread payoff diagram and add unit test.
 # TODO: Implement condor payoff diagram and add unit test.
 
-def make_payoff(
-    payoff_fn: Callable[..., FloatArray], *args: float, **kwargs: float
-) -> PayoffCallable:
+
+def make_payoff(payoff_fn, *args, **kwargs):
     """
     Generic factory: returns a callable that binds payoff params except asset_price.
     Assumes payoff_fn takes asset_price as its first parameter.
     """
-    return lambda asset_price: payoff_fn(asset_price, *args, **kwargs)
+    payoff_name = getattr(payoff_fn, "__name__", payoff_fn.__class__.__name__)
+
+    if getattr(payoff_fn, "_is_vectorized_payoff", False):
+
+        def payoff(asset_price):
+            return payoff_fn(asset_price, *args, **kwargs)
+
+        payoff.__name__ = payoff_name
+        payoff.__doc__ = getattr(payoff_fn, "__doc__", None)
+        return payoff
+
+    bound_payoff = functools.partial(payoff_fn, *args, **kwargs)
+    return vectorize_payoff(bound_payoff, name=payoff_name)
 
 
 def plot_payoff(
-    payoff: PayoffCallable,
-    min_asset_price: float,
-    max_asset_price: float,
-    xlabel: str = r"$S(T)$",
-    ylabel: Optional[str] = None,
-    title: Optional[str] = None,
-) -> None:
+    payoff,
+    min_asset_price,
+    max_asset_price,
+    xlabel=r"$S(T)$",
+    ylabel=None,
+    title=None,
+):
     """Plot a payoff callable over a range of asset prices."""
     asset_prices = np.linspace(min_asset_price, max_asset_price, 1000)
     payout_values = payoff(asset_prices)
@@ -101,39 +118,16 @@ def plot_payoff(
     plt.show()
 
 
-def plot_payoffs(
-    payoffs: PayoffSeries,
-    min_asset_price: float,
-    max_asset_price: float,
-    xlabel: str = r"$S(T)$",
-    ylabel: Optional[str] = None,
-    title: Optional[str] = None,
-) -> None:
-    """
-    Plot multiple payoff callables over a shared asset price range.
-
-    Example:
-        payoffs = {
-            "call": make_payoff(long_call_payoff, strike=100),
-            "put": make_payoff(long_put_payoff, strike=100),
-        }
-        plot_payoffs(payoffs, min_asset_price=80, max_asset_price=120)
-    """
+def plot_payoffs(payoffs, min_asset_price, max_asset_price):
+    """Plot multiple payoff callables over a range of asset prices."""
     asset_prices = np.linspace(min_asset_price, max_asset_price, 1000)
-    payoff_items: Sequence[Tuple[str, PayoffCallable]]
-    if isinstance(payoffs, Mapping):
-        payoff_items = list(payoffs.items())
-    else:
-        payoff_items = list(cast(Sequence[Tuple[str, PayoffCallable]], payoffs))
 
     plt.figure()
-    for label, payoff_fn in payoff_items:
-        plt.plot(asset_prices, payoff_fn(asset_prices), label=label)
+    for name, payoff in payoffs.items():
+        plt.plot(asset_prices, payoff(asset_prices), label=name)
 
-    plt.xlabel(xlabel)
-    if ylabel:
-        plt.ylabel(ylabel)
-    plt.title(title or "Payoffs")
+    plt.xlabel(r"$S(T)$")
+    plt.title("Payoffs")
     plt.grid()
     plt.legend()
     plt.show()
@@ -193,5 +187,4 @@ if __name__ == "__main__":
         combined_payoffs,
         min_asset_price=80,
         max_asset_price=120,
-        title="Combined Payoffs",
     )
